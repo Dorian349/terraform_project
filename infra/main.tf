@@ -1,30 +1,33 @@
-# Version du provider Terraform pour Docker
+# Déclaration de la version du provider Terraform
 terraform {
   required_providers {
     docker = {
       source = "kreuzwerker/docker"
+      version = "3.0.2"
     }
   }
 }
 
-# Configuration du provider Docker avec un hôte local
+# Configuration du provider Docker
 provider "docker" {
   host = "unix:///var/run/docker.sock"
 }
 
-# Ressource "docker_image" pour construire l'image Docker
+# Création de l'image Docker
 resource "docker_image" "build" {
-  name          = "nom_de_votre_image"
-  build_context = "${path.module}/.."
-  dockerfile    = "${path.module}/../Dockerfile"
+  name         = "tp_terraform:latest"
+  build {
+    context = "../app"
+    dockerfile = "Dockerfile" 
+  }
 }
 
-# Ressource "docker_container" pour déployer le conteneur à partir de l'image
+# Création du conteneur Docker
 resource "docker_container" "container" {
-  name  = "nom_de_votre_conteneur"
+  name  = "tp_terraform"
   image = docker_image.build.name
   ports {
-    internal = 3000
-    external = 8080
+    internal = 8000
+    external = 8080 # Port externe pour accéder à votre application
   }
 }
